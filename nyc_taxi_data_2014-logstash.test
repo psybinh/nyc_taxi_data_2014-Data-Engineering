@@ -1,6 +1,6 @@
 input { 
 	file { 
-		path => "~/nyc_taxi_data_2014.csv" 
+		path => "/home/ubuntu/nyc_taxi_data_2014-Data-Engineering/nyc_taxi_data_2014_short_sample.csv" 
 		start_position => "beginning" 
 		sincedb_path => "/dev/null"
 	} 
@@ -68,5 +68,7 @@ flter {
 }
 
 output { 
-	stdout {}
+	stdout {
+        	codec => "rubydebug"
+	}
 }
