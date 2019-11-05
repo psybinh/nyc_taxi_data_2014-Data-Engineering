@@ -1,8 +1,9 @@
 input { 
 	file { 
-		path => "~/nyc_taxi_data_2014-Data-Engineering/nyc_taxi_data_2014_short_sample.csv" 
+		path => "/home/ubuntu/nyc_taxi_data_2014-Data-Engineering/nyc_taxi_data_2014_short_sample.csv" 
 		start_position => "beginning" 
 		sincedb_path => "/dev/null"
+		file_completed_action => "delete"
 	} 
 }
 
@@ -49,13 +50,14 @@ flter {
 			"[dropoff_location][lon]" => "float"
 			"[dropoff_location][lat]" => "float"
 		}
-	}
+		remove_field => ["path", "message", "host", "@timestamp", "@version"]
+	}	
 }
 
 output { 
 	stdout {
-		codec => "rubydebug"
-    }
+        	codec => "rubydebug"
+	}
 }
 
 
