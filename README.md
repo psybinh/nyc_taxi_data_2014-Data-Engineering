@@ -171,5 +171,35 @@ To login nginx server, please input username and password:
 Username: kibanaadmin
 Password: LcBZD2fesTa5
 
+# Issue
+There is an issue. That is converting `pickup_location` or `dropoff_location`. If the source value can not be converted to `float` and the destination value could be anomaly or If latitude or logtitude is greater than or equal 180 or slower than or euqal -180, errors will occur. 
+
+```
+[2019-11-05T07:31:23,515][WARN ][logstash.outputs.elasticsearch] Could not index event to Elasticsearch. {:status=>400, :action=>["index", {:_id=>nil, :_index=>"nyc_taxi_data_2014", :_type=>"doc", :routing=>nil}, #<LogStash::Event:0xe45b26>], :response=>{"index"=>{"_index"=>"nyc_taxi_data_2014", "_type"=>"doc", "_id"=>"VO95Om4B6PHSiacoribN", "status"=>400, "error"=>{"type"=>"mapper_parsing_exception", "reason"=>"failed to parse field [dropoff_location] of type [geo_point]", "caused_by"=>{"type"=>"parse_exception", "reason"=>"latitude must be a number"}}}}}
+```
+
+```
+[2019-11-05T08:41:25,839][WARN ][logstash.outputs.elasticsearch] Could not index event to Elasticsearch. {:status=>400, :action=>["index", {:_id=>nil, :_index=>"nyc_taxi_data_2014", :_type=>"doc", :routing=>nil}, #<LogStash::Event:0xb2f94a0>], :response=>{"index"=>{"_index"=>"nyc_taxi_data_2014", "_type"=>"doc", "_id"=>"6Ta5Om4B6PHSiacozogw", "status"=>400, "error"=>{"type"=>"mapper_parsing_exception", "reason"=>"failed to parse field [dropoff_location] of type [geo_point]", "caused_by"=>{"type"=>"illegal_argument_exception", "reason"=>"illegal longitude value [-775.416665] for dropoff_location"}}}}}
+```
+
+I tried to alter elasticsearch index to be toleranced with anormaly data:
+
+```
+"dropoff_location":{ 
+	"type":"geo_point",
+	"ignore_malformed": true
+}
+```
+
+The issue still is not solved.
+
+Also, I tried to use if condition in logstash configuration to replace all anormaly latitude or longitude to zero. But in the case that source value can not be converted to `float`, an other error occured. 
+
+I found out that `ruby filter` can resolve this issue, but because of lacking time, I could not try.
+
+In conclustion, this issue still has not been solved.
+
+Because of this issue, the data is missed 263 records.
+
 # Automation with concourse
-When I started doing this project, It was first time I heared about CI/CD processing in software development. Therefore I can not apply it. I think applying it take me about 2 weeks or more, 1 week for understanding about CI/CD and get familiar with Ansible (an similar framwork with Concourse but more popular, getting familiar with a more popular framwork is often easier) and 1 week for starting with Concourse.
+When I started doing this project, It was first time I heared about CI/CD processing in software development. Therefore I can not apply it. I think applying it take me about 2 weeks or more instead of 5 days, 1 week for understanding about CI/CD and get familiar with Ansible (an similar framwork with Concourse but more popular, getting familiar with a more popular framwork is often easier) and 1 week for starting with Concourse.

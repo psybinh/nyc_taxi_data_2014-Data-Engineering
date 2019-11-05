@@ -1,3 +1,4 @@
+PUT nyc_taxi_data_2014
 { 
    "mappings":{ 
       "doc":{ 
@@ -6,7 +7,8 @@
                "type":"date"
             },
             "dropoff_location":{ 
-               "type":"geo_point"
+               "type":"geo_point",
+               "ignore_malformed": true
             },
             "fare_amount":{ 
                "type":"float"
@@ -30,7 +32,8 @@
                "type":"date"
             },
             "pickup_location":{ 
-               "type":"geo_point"
+               "type":"geo_point",
+               "ignore_malformed": true
             },
             "rate_code":{ 
                "type":"long"
