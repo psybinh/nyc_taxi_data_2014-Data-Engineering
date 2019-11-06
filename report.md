@@ -80,4 +80,4 @@ This issue has not been solved yet.
 Because of this issue, the data is missed 108 records.
 
 # Issue 2
-Because of the too big volumn of data, I could not add script field that equal difference between `pickup_datetime` and `dropoff_datetime`. This action would consume a lot of computation resource.
+Because of the too big volumn of data, I could not add `script field` that equal difference between `pickup_datetime` and `dropoff_datetime`. This action would consume a lot of computation resource.
