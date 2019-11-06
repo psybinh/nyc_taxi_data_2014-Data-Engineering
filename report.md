@@ -47,10 +47,6 @@ There are some images of the dashboard:
 
 ![dashboard 5](./images/db-5.png)
 
-![dashboard 6](./images/db-6.png)
-
-![dashboard 7](./images/db-7.png)
-
 # Issue 1
 There is an issue. That is converting `pickup_location` or `dropoff_location`. If the source value could not be converted to `float`, the destination value could be abnomal or If latitude or logtitude is greater than or equal 180 or slower than or euqual -180, errors will occur. 
 
