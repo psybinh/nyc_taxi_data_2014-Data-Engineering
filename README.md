@@ -24,7 +24,7 @@ Elasticsearch is a NoSQL database and we can not execute ad-hoc queries to it, s
 
 # Elasticsearch 
 
-###Index mapping 
+### Index mapping 
 I have to specify index before running logstash to put data because I have not found out any way to map location to geo_point data type automatically.
 ```
 "mappings":{ 
@@ -167,8 +167,11 @@ output {
 
 # Kibana
 Url: http://13.251.89.102
+
 To login nginx server, please input username and password:
+
 Username: kibanaadmin
+
 Password: LcBZD2fesTa5
 
 # Issue 1
