@@ -26,153 +26,23 @@ Elasticsearch is a NoSQL database and we can not execute ad-hoc queries to it, s
 
 ### Index mapping 
 I have to specify index before running logstash to put data because I have not found out any way to map location to geo_point data type automatically.
-```
-"mappings":{ 
-      "doc":{ 
-         "properties":{ 
-            "dropoff_datetime":{ 
-               "type":"date"
-            },
-            "dropoff_location":{ 
-               "type":"geo_point"
-            },
-            "fare_amount":{ 
-               "type":"float"
-            },
-            "mta_tax":{ 
-               "type":"float"
-            },
-            "passenger_count":{ 
-               "type":"long"
-            },
-            "payment_type":{ 
-               "type":"text",
-               "fields":{ 
-                  "keyword":{ 
-                     "type":"keyword",
-                     "ignore_above":256
-                  }
-               }
-            },
-            "pickup_datetime":{ 
-               "type":"date"
-            },
-            "pickup_location":{ 
-               "type":"geo_point"
-            },
-            "rate_code":{ 
-               "type":"long"
-            },
-            "store_and_fwd_flag":{ 
-               "type":"boolean"
-            },
-            "surcharge":{ 
-               "type":"float"
-            },
-            "tip_amount":{ 
-               "type":"float"
-            },
-            "tolls_amount":{ 
-               "type":"float"
-            },
-            "total_amount":{ 
-               "type":"float"
-            },
-            "trip_distance":{ 
-               "type":"float"
-            },
-            "vendor_id":{ 
-               "type":"text",
-               "fields":{ 
-                  "keyword":{ 
-                     "type":"keyword",
-                     "ignore_above":256
-                  }
-               }
-            }
-         }
-      }
-   }
-```
+
+Index in the file `elasticsearch-index.txt`
 
 # Logstash 
 
 ### Configuration
-In the following code, I just want to run logstash one time to put the data to elasticsearch and I will turn off logstash service after that. Therefore, I added the line: `sincedb_path => "/dev/null"`.
-
-```
-input { 
-	file { 
-		path => "~/nyc_taxi_data_2014-Data-Engineering/nyc_taxi_data_2014_short_sample.csv" 
-		start_position => "beginning" 
-		sincedb_path => "/dev/null"
-	} 
-}
-
-flter {
-	csv {
-        columns => ["vendor_id", "pickup_datetime", "dropoff_datetime", "passenger_count", "trip_distance", "pickup_longitude", "pickup_latitude", "rate_code", "store_and_fwd_flag", "dropoff_longitude", "dropoff_latitude", "payment_type", "fare_amount", "surcharge", "mta_tax", "tip_amount", "tolls_amount", "total_amount"]
-        separator => ","
-        skip_header => "true"
-    }
-    date {
-		match => [ "pickup_datetime", "yyyy-MM-dd HH:mm:ss" ]
-		target => "pickup_datetime"
-	}
-	date {
-		match => [ "dropoff_datetime", "yyyy-MM-dd HH:mm:ss" ]
-		target => "dropoff_datetime"
-	}
-	mutate {
-		convert => {
-			"passenger_count" => "integer"
-			"trip_distance" => "float"
-			"rate_code" => "integer"
-			"store_and_fwd_flag" => "boolean"
-			"fare_amount" => "float"
-			"surcharge" => "float"
-			"mta_tax" => "float"
-			"tip_amount" => "float"
-			"tolls_amount" => "float"
-			"total_amount" => "float"
-		}
-		rename => {
-			"pickup_longitude" => "[pickup_location][lon]"
-			"pickup_latitude" => "[pickup_location][lat]"
-		}
-		convert => {
-			"[pickup_location][lon]" => "float"
-			"[pickup_location][lat]" => "float"
-		}
-		rename => {
-			"dropoff_longitude" => "[dropoff_location][lon]"
-			"dropoff_latitude" => "[dropoff_location][lat]"
-		}
-		convert => {
-			"[dropoff_location][lon]" => "float"
-			"[dropoff_location][lat]" => "float"
-		}
-	}
-}
-
-
-output { 
-	elasticsearch { 
-		host => "localhost:9200" 
-		index => "nyc_taxi_data_2014" 
-	}
-	stdout {}
-}
-```
+Configuration in the file `nyc_taxi_data_2014-logstash.conf`
 
 # Kibana
-Url: http://13.251.89.102
-
-To login nginx server, please input username and password:
-
-Username: kibanaadmin
-
-Password: LcBZD2fesTa5
+There are some images of the dashboard:
+![dashboard 1](./images/db-1.png)
+![dashboard 2](./images/db-2.png)
+![dashboard 3](./images/db-3.png)
+![dashboard 4](./images/db-4.png)
+![dashboard 5](./images/db-5.png)
+![dashboard 6](./images/db-6.png)
+![dashboard 7](./images/db-7.png)
 
 # Issue 1
 There is an issue. That is converting `pickup_location` or `dropoff_location`. If the source value can not be converted to `float` and the destination value could be abnomal or If latitude or logtitude is greater than or equal 180 or slower than or euqual -180, errors will occur. 
@@ -201,6 +71,8 @@ Also, I tried to use if condition in logstash configuration to replace all abnom
 I found out that `ruby filter` would solve this issue, but because of lacking time, I could not try.
 
 In conclustion, this issue still has not been solved.
+
+![issue 1](./images/db-7.png)
 
 Because of this issue, the data is missed 263 records.
 
